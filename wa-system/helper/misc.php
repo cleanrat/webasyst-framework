@@ -277,4 +277,30 @@ function wa_array_diff_r($value1, $value2, &$diff) {
     }
 }
 
+/**
+ * Replaces named parameters in a format string using sprintf() function modifiers
+ * @param string $string Format string containing variable names in the form {%sprintf_modifier$variable_name};
+ *        e.g., {%s$some_string} or {%.2f$some_float_number}
+ * @param array $params Associative array of replacements with keys matching the names of variables in the format string
+ * @return string String with variables replaced with param values
+ * @example wa_vnsprintf(
+ *              'Hi {%s$firstname} {%s$lastname}! Here is your money: ${%.2f$money}.',
+ *              array(
+ *                  'firstname' => 'John',
+ *                  'lastname'  => 'Doe',
+ *                  'money'     => 1.23456
+ *              )
+ *          );
+ *          Result: 'Hi John Doe! Here is your money: $1.23.'
+ */
 
+function wa_vnsprintf ($string, $params)
+{
+    if (preg_match_all('/\{(%[^\$]+)\$(\w+)\}/', $string, $matches)) {
+        list($vars, $modifiers, $keys) = $matches;
+        foreach ($vars as $i => $var) {
+            $string = str_replace($var, sprintf($modifiers[$i], $params[$keys[$i]]), $string);
+        }
+    }
+    return $string;
+}
